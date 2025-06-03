@@ -28,6 +28,7 @@ import mantineTheme from './mantineTheme';
 import API from './api';
 import { Notifications } from '@mantine/notifications';
 import M3URefreshNotification from './components/M3URefreshNotification';
+import UpdateNotification from './components/UpdateNotification';
 import 'allotment/dist/style.css';
 
 const drawerWidth = 240;
@@ -152,6 +153,7 @@ const App = () => {
             </AppShell.Main>
           </AppShell>
           <M3URefreshNotification />
+          <UpdateNotification />
           <Notifications containerWidth={350} />
         </Router>
       </WebsocketProvider>

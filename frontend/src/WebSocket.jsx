@@ -12,6 +12,7 @@ import useChannelsStore from './store/channels';
 import usePlaylistsStore from './store/playlists';
 import useEPGsStore from './store/epgs';
 import { Box, Button, Stack, Alert, Group } from '@mantine/core';
+import { showUpdateNotification } from './utils/updateNotification';
 import API from './api';
 import useSettingsStore from './store/settings';
 import useAuthStore from './store/auth';
@@ -277,6 +278,13 @@ export const WebsocketProvider = ({ children }) => {
                 title: 'Recording finished!',
                 message: `Stopped recording channel ${parsedEvent.data.channel}`,
               });
+              break;
+
+            case 'update_available':
+              showUpdateNotification(
+                parsedEvent.data.latest_version,
+                parsedEvent.data.url
+              );
               break;
 
             case 'epg_fetch_error':

@@ -139,6 +139,8 @@ DEFAULT_STREAM_PROFILE_KEY = slugify("Default Stream Profile")
 STREAM_HASH_KEY = slugify("M3U Hash Key")
 PREFERRED_REGION_KEY = slugify("Preferred Region")
 AUTO_IMPORT_MAPPED_FILES = slugify("Auto-Import Mapped Files")
+AVAILABLE_UPDATE_VERSION_KEY = slugify("Available Update Version")
+AVAILABLE_UPDATE_URL_KEY = slugify("Available Update URL")
 
 class CoreSettings(models.Model):
     key = models.CharField(
@@ -181,5 +183,19 @@ class CoreSettings(models.Model):
         """Retrieve the preferred region setting (or return None if not found)."""
         try:
             return cls.objects.get(key=AUTO_IMPORT_MAPPED_FILES).value
+        except cls.DoesNotExist:
+            return None
+            
+    @classmethod
+    def get_available_update_version(cls):
+        try:
+            return cls.objects.get(key=AVAILABLE_UPDATE_VERSION_KEY).value
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_available_update_url(cls):
+        try:
+            return cls.objects.get(key=AVAILABLE_UPDATE_URL_KEY).value
         except cls.DoesNotExist:
             return None

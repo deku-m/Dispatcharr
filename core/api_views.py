@@ -106,7 +106,11 @@ def environment(request):
 def version(request):
     # Import version information
     from version import __version__, __timestamp__
+    update_version = CoreSettings.get_available_update_version()
+    update_url = CoreSettings.get_available_update_url()
     return Response({
         'version': __version__,
         'timestamp': __timestamp__,
+        'update_version': update_version,
+        'update_url': update_url,
     })

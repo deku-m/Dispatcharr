@@ -209,6 +209,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'core.tasks.scan_and_process_files',  # Direct task call
         'schedule': 20.0,  # Every 20 seconds
     },
+    'check-for-update': {
+        'task': 'core.tasks.check_for_update',
+        'schedule': 60 * 60 * 12,  # Every 12 hours
+    },
 }
 
 MEDIA_ROOT = BASE_DIR / 'media'
