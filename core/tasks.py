@@ -57,6 +57,45 @@ def _version_tuple(version_str):
 
 
 @shared_task
+def check_for_update():
+    """Check GitHub for a newer Dispatcharr release."""
+    try:
+        resp = requests.get(
+            "https://api.github.com/repos/Dispatcharr/Dispatcharr/releases/latest",
+            timeout=10,
+        )
+        resp.raise_for_status()
+        latest = resp.json().get("tag_name", "").lstrip("v")
+        release_url = resp.json().get("html_url", "")
+
+        if latest and _version_tuple(latest) > _version_tuple(__version__):
+            send_websocket_update(
+                "updates",
+                "update",
+                {
+                    "success": True,
+                    "type": "update_available",
+                    "latest_version": latest,
+                    "current_version": __version__,
+                    "url": release_url,
+                },
+            )
+            CoreSettings.objects.update_or_create(
+                key=AVAILABLE_UPDATE_VERSION_KEY,
+                defaults={"name": "Available Update Version", "value": latest},
+            )
+            CoreSettings.objects.update_or_create(
+                key=AVAILABLE_UPDATE_URL_KEY,
+                defaults={"name": "Available Update URL", "value": release_url},
+            )
+        else:
+            CoreSettings.objects.filter(key=AVAILABLE_UPDATE_VERSION_KEY).delete()
+            CoreSettings.objects.filter(key=AVAILABLE_UPDATE_URL_KEY).delete()
+    except Exception as e:
+        logger.warning(f"Failed to check for updates: {e}")
+
+
+@shared_task
 def beat_periodic_task():
     fetch_channel_stats()
     scan_and_process_files()
