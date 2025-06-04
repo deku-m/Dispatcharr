@@ -104,10 +104,25 @@ def environment(request):
 )
 @api_view(['GET'])
 def version(request):
-    # Import version information
     from version import __version__, __timestamp__
-    update_version = CoreSettings.get_available_update_version()
-    update_url = CoreSettings.get_available_update_url()
+    try:
+        resp = requests.get(
+            "https://api.github.com/repos/Dispatcharr/Dispatcharr/releases/latest",
+            timeout=10,
+        )
+        resp.raise_for_status()
+        latest = resp.json().get("tag_name", "").lstrip("v")
+        release_url = resp.json().get("html_url", "")
+        if latest and _version_tuple(latest) > _version_tuple(__version__):
+            update_version = latest
+            update_url = release_url
+        else:
+            update_version = None
+            update_url = None
+    except Exception:
+        update_version = None
+        update_url = None
+
     return Response({
         'version': __version__,
         'timestamp': __timestamp__,
